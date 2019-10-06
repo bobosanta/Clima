@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
+      "filename" : "fog.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "fog.png"
+      "scale" : "2x"
     },
     {
       "idiom" : "universal",
