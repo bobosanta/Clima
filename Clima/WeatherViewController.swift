@@ -30,6 +30,10 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var weatherStatusLabel: UILabel!
     @IBOutlet weak var humidityLabel: UILabel!
+    @IBOutlet weak var currentDayLabel: UILabel!
+    @IBOutlet weak var currentDateLabel: UILabel!
+    @IBOutlet weak var currentHourLabel: UILabel!
+    @IBOutlet weak var backGroundImage: UIImageView!
     
     
     override func viewDidLoad() {
@@ -41,9 +45,51 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
+        getSingle()
     }
     
+    //    MARK: - Set up date and time
+    func getSingle() {
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE"
+        let calendar = Calendar.current
+        let weekDay = dateFormatter.string(from: date).uppercased()
+        let hour = calendar.component(.hour, from: date)
+        let minutes = calendar.component(.minute, from: date)
+        
+        currentDayLabel.text = "\(weekDay)"
+        currentHourLabel.text = ("\(hour)" + ":" + "\(minutes)")
+        
+        getMonth()
+    }
     
+    func getMonth() {
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d LLLL"
+        let monthString = dateFormatter.string(from: date)
+        currentDateLabel.text = monthString.uppercased()
+        changeBg()
+    }
+    
+    func changeBg() {
+        
+        let calendar = Calendar.current
+        let startTimeComponent = DateComponents(calendar: calendar, hour:8)
+        let endTimeComponent   = DateComponents(calendar: calendar, hour: 18, minute: 00)
+        
+        let now = Date()
+        let startOfToday = calendar.startOfDay(for: now)
+        let startTime    = calendar.date(byAdding: startTimeComponent, to: startOfToday)!
+        let endTime      = calendar.date(byAdding: endTimeComponent, to: startOfToday)!
+        
+        if startTime <= now && now <= endTime {
+            backGroundImage.image = UIImage(named: "Day-bg.png")
+        } else {
+            backGroundImage.image = UIImage(named: "Night-bg.png")
+        }
+    }
     
     //MARK: - Networking
     /***************************************************************/
@@ -55,7 +101,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             response in
             if response.result.isSuccess {
                 print("Success !")
-                print(response)
                 
                 let weatherJSON: JSON = JSON(response.result.value!)
                 self.updateWeatherData(json: weatherJSON)
